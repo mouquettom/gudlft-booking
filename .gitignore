@@ -24,7 +24,7 @@ htmlcov/
 # Logs
 *.log
 
-# Local databases (si un jour tu en ajoutes)
+# Local databases
 *.sqlite3
 
 # Build
