@@ -93,8 +93,8 @@ GUDLFT/
 ### Cloner le projet
 
 ```bash
-git clone <repository_url>
-cd GUDLFT
+git clone git@github.com:mouquettom/GUDLFT-TESTS.git
+cd GUDLFT-TESTS
 ```
 
 ### Créer un environnement virtuel
@@ -264,8 +264,6 @@ Réservation de plus de 12 places autorisée.
 
 ## Auteur
 
-Tom Mouquet
+@tom_mouquet
 
-Projet réalisé dans le cadre de la formation :
-
-Développeur d'application Python – OpenClassrooms
+Projet réalisé dans le cadre de la formation OpenClassrooms.
