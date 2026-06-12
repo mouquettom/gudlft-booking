@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Summary | GUDLFT{% endblock %}
+
+{% block content %}
+
+    <h2>Welcome, {{ club['email'] }}</h2>
+
+    <a href="{{ url_for('logout') }}">Logout</a>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <p>Points available: {{ club['points'] }}</p>
+
+    <h3>Competitions:</h3>
+
+    <ul>
+        {% for comp in competitions %}
+            <li>
+                <p>{{ comp['name'] }}</p>
+                <p>Date: {{ comp['date'] }}</p>
+                <p>Number of Places: {{ comp['numberOfPlaces'] }}</p>
+                {% if comp['numberOfPlaces'] | int > 0 %}
+                    <a href="{{ url_for(
+                        'book',
+                        competition=comp['name'].replace(' ', '_').lower(),
+                        club=club['name'].replace(' ', '_').lower()
+                    ) }}">Book places</a>
+                {% else %}
+                    <strong>Competition full</strong>
+                {% endif %}
+            </li>
+            <hr />
+        {% endfor %}
+    </ul>
+
+{% endblock %}

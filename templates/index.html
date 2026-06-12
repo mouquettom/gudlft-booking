@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Home | GUDLFT{% endblock %}
+
+{% block content %}
+
+    <section>
+        <h2>Welcome to the GÜDLFT Registration Portal</h2>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <p>Please enter your secretary email to continue:</p>
+
+        <form action="{{ url_for('login') }}" method="post">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" required>
+            <button type="submit">Enter</button>
+        </form>
+    </section>
+
+{% endblock %}
