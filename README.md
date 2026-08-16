@@ -1,4 +1,4 @@
-# gudlft-booking
+# GÜDLFT Booking
 
 ## Description
 
