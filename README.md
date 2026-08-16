@@ -253,4 +253,5 @@ Booking more than 12 spots was allowed.
 
 @tom_mouquet
 
-Project developed as part of the OpenClassrooms training program.
+Project developed as part of the OpenClassrooms **Développeur
+d'application Python** training program.
