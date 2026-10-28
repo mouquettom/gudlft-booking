@@ -39,7 +39,8 @@ def test_points_page_displays_clubs(client):
     assert b"She Lifts" in response.data
 
 
-# Teste que la page de réservation s'affiche avec une compétition et un club valides
+# Teste que la page de réservation s'affiche avec une compétition
+# et un club valides
 def test_book_page_valid_data(client):
     response = client.get("/book/spring_festival/simply_lift")
 

@@ -44,7 +44,8 @@ def test_parse_competition_date_french_format():
     assert isinstance(result, datetime)
 
 
-# Teste qu'une date invalide retourne None au lieu de faire planter l'application
+# Teste qu'une date invalide retourne None au lieu de faire planter
+# l'application
 def test_parse_competition_date_invalid_format():
     result = parse_competition_date("bad-date")
     assert result is None

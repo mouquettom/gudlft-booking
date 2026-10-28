@@ -141,7 +141,9 @@ def login():
         return redirect(url_for('index'))
 
     # Sinon, on affiche la page récapitulative du club
-    return render_template('showSummary.html', club=club, competitions=competitions)
+    return render_template(
+        'showSummary.html', club=club, competitions=competitions
+    )
 
 
 # Route affichant la page de réservation
@@ -210,7 +212,9 @@ def purchasePlaces():
 
     if error:
         flash(error)
-        return render_template('booking.html', club=club, competition=competition)
+        return render_template(
+            'booking.html', club=club, competition=competition
+        )
 
     # Si la réservation est valide, on met à jour les données en mémoire
     competition['numberOfPlaces'] = availablePlaces - placesRequired
@@ -221,7 +225,9 @@ def purchasePlaces():
 
     flash('Great-booking complete!')
 
-    return render_template('showSummary.html', club=club, competitions=competitions)
+    return render_template(
+        'showSummary.html', club=club, competitions=competitions
+    )
 
 
 # Page publique des points
