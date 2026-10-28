@@ -4,23 +4,45 @@ from flask import Flask, render_template, request, redirect, flash, url_for
 
 
 # Charge les clubs depuis clubs.json
+# Les points sont convertis en entiers une fois pour toutes
 def loadClubs():
     with open('clubs.json') as c:
         listOfClubs = json.load(c)['clubs']
-        return listOfClubs
+    for club in listOfClubs:
+        club['points'] = int(club['points'])
+    return listOfClubs
 
 
 # Charge les compétitions depuis competitions.json
+# Le nombre de places est converti en entier une fois pour toutes
 def loadCompetitions():
     with open('competitions.json') as comps:
         listOfCompetitions = json.load(comps)['competitions']
-        return listOfCompetitions
+    for competition in listOfCompetitions:
+        competition['numberOfPlaces'] = int(competition['numberOfPlaces'])
+    return listOfCompetitions
 
 
 # Transforme un nom en slug compatible URL
 # Exemple : "Spring Festival" -> "spring_festival"
 def slugify(value):
     return value.replace(' ', '_').lower()
+
+
+# Recherche le premier élément (club ou compétition) dont le champ `key`
+# vaut `value`. Renvoie None si aucun élément ne correspond.
+# Exemple : find_by(clubs, 'email', 'john@simplylift.co')
+def find_by(items, key, value):
+    return next((item for item in items if item[key] == value), None)
+
+
+# Recherche un élément (club ou compétition) à partir du slug de son nom
+# Exemple : find_by_slug(competitions, 'spring_festival')
+def find_by_slug(items, slug):
+    return next(
+        (item for item in items if slugify(item['name']) == slug),
+        None
+    )
 
 
 # Convertit une date texte en objet datetime Python
@@ -94,8 +116,9 @@ def booked_places(club_name, competition_name):
     return bookings.get((club_name, competition_name), 0)
 
 
-# Rend booked_places() utilisable dans les templates
+# Rend booked_places() et le filtre slugify utilisables dans les templates
 app.jinja_env.globals['booked_places'] = booked_places
+app.add_template_filter(slugify)
 
 
 # Route d'accueil
@@ -110,7 +133,7 @@ def login():
     email = request.form.get('email')
 
     # Recherche sécurisée du club correspondant à l'email
-    club = next((c for c in clubs if c['email'] == email), None)
+    club = find_by(clubs, 'email', email)
 
     # Si aucun club n'est trouvé, on affiche une erreur
     if not club:
@@ -124,15 +147,8 @@ def login():
 # Route affichant la page de réservation
 @app.route('/book/<competition>/<club>')
 def book(competition, club):
-    foundClub = next(
-        (c for c in clubs if slugify(c['name']) == club),
-        None
-    )
-
-    foundCompetition = next(
-        (comp for comp in competitions if slugify(comp['name']) == competition),
-        None
-    )
+    foundClub = find_by_slug(clubs, club)
+    foundCompetition = find_by_slug(competitions, competition)
 
     # Si le club ou la compétition n'existe pas, on évite le crash
     if not foundClub or not foundCompetition:
@@ -163,17 +179,9 @@ def purchasePlaces():
     club_name = request.form.get('club')
     places = request.form.get('places')
 
-    # Recherche de la compétition
-    competition = next(
-        (comp for comp in competitions if comp['name'] == competition_name),
-        None
-    )
-
-    # Recherche du club
-    club = next(
-        (c for c in clubs if c['name'] == club_name),
-        None
-    )
+    # Recherche de la compétition et du club
+    competition = find_by(competitions, 'name', competition_name)
+    club = find_by(clubs, 'name', club_name)
 
     # Sécurité : si les données envoyées sont incorrectes
     if not competition or not club:
@@ -191,8 +199,8 @@ def purchasePlaces():
             competition=competition,
         )
 
-    availablePlaces = int(competition['numberOfPlaces'])
-    clubPoints = int(club['points'])
+    availablePlaces = competition['numberOfPlaces']
+    clubPoints = club['points']
     alreadyBooked = booked_places(club['name'], competition['name'])
 
     # Vérification des règles métier
