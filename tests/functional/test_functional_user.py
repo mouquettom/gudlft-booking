@@ -39,7 +39,9 @@ def test_booking_deducts_points_and_places(client):
     )
 
     club = next(c for c in server.clubs if c["name"] == "Simply Lift")
-    competition = next(c for c in server.competitions if c["name"] == "Spring Festival")
+    competition = next(
+        c for c in server.competitions if c["name"] == "Spring Festival"
+    )
 
     assert int(club["points"]) == 8
     assert int(competition["numberOfPlaces"]) == 20
@@ -57,7 +59,9 @@ def test_booking_does_not_alter_data_on_failure(client):
     )
 
     club = next(c for c in server.clubs if c["name"] == "Iron Temple")
-    competition = next(c for c in server.competitions if c["name"] == "Spring Festival")
+    competition = next(
+        c for c in server.competitions if c["name"] == "Spring Festival"
+    )
 
     assert int(club["points"]) == 4
     assert int(competition["numberOfPlaces"]) == 25
