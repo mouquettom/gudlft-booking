@@ -45,14 +45,6 @@ nav a {
     text-align: center;
 }
 
-.card {
-    background: white;
-    padding: 40px;
-    border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
-    margin-bottom: 32px;
-}
-
 h2 {
     font-size: 36px;
     margin-top: 0;
