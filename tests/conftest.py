@@ -17,6 +17,7 @@ def client():
     # Avant chaque test, on remet les clubs et compétitions à leur état initial
     server.clubs = copy.deepcopy(ORIGINAL_CLUBS)
     server.competitions = copy.deepcopy(ORIGINAL_COMPETITIONS)
+    server.bookings = {}
 
     # On retourne un faux client HTTP Flask
     return app.test_client()

@@ -52,12 +52,18 @@ def is_competition_past(competition):
     return date < datetime.now()
 
 
+# Nombre maximum de places qu'un club peut réserver sur une compétition
+MAX_PLACES_PER_COMPETITION = 12
+
+
 # Vérifie les règles métier d'une réservation
-def validate_booking(places_required, available_places, club_points):
+# already_booked : places déjà réservées par ce club sur cette compétition
+def validate_booking(places_required, available_places, club_points,
+                     already_booked=0):
     if places_required <= 0:
         return 'You must book at least one place.'
-    if places_required > 12:
-        return 'You cannot book more than 12 places.'
+    if already_booked + places_required > MAX_PLACES_PER_COMPETITION:
+        return 'You cannot book more than 12 places per competition.'
     if places_required > available_places:
         return 'Not enough places available.'
     if places_required > club_points:
@@ -77,6 +83,19 @@ app.secret_key = 'something_special'
 # Les fichiers JSON sont chargés une fois au lancement du serveur
 competitions = loadCompetitions()
 clubs = loadClubs()
+
+# Places déjà réservées, par couple (nom du club, nom de la compétition)
+# Exemple : {("Simply Lift", "Spring Festival"): 5}
+bookings = {}
+
+
+# Renvoie le nombre de places déjà réservées par un club sur une compétition
+def booked_places(club_name, competition_name):
+    return bookings.get((club_name, competition_name), 0)
+
+
+# Rend booked_places() utilisable dans les templates
+app.jinja_env.globals['booked_places'] = booked_places
 
 
 # Route d'accueil
@@ -174,9 +193,12 @@ def purchasePlaces():
 
     availablePlaces = int(competition['numberOfPlaces'])
     clubPoints = int(club['points'])
+    alreadyBooked = booked_places(club['name'], competition['name'])
 
     # Vérification des règles métier
-    error = validate_booking(placesRequired, availablePlaces, clubPoints)
+    error = validate_booking(
+        placesRequired, availablePlaces, clubPoints, alreadyBooked
+    )
 
     if error:
         flash(error)
@@ -185,6 +207,9 @@ def purchasePlaces():
     # Si la réservation est valide, on met à jour les données en mémoire
     competition['numberOfPlaces'] = availablePlaces - placesRequired
     club['points'] = clubPoints - placesRequired
+    bookings[(club['name'], competition['name'])] = (
+        alreadyBooked + placesRequired
+    )
 
     flash('Great-booking complete!')
 
