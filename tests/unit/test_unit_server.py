@@ -4,9 +4,22 @@ from server import (
     parse_competition_date,
     is_competition_past,
     validate_booking,
-    clubs,
-    competitions
+    find_by,
+    find_by_slug,
+    loadClubs,
+    loadCompetitions
 )
+
+
+# Données de test indépendantes des fichiers JSON
+FAKE_CLUBS = [
+    {"name": "Test Club", "email": "test@club.com", "points": 10},
+    {"name": "Other Club", "email": "other@club.com", "points": 3},
+]
+FAKE_COMPETITIONS = [
+    {"name": "Winter Cup", "date": "2099-01-01 10:00:00",
+     "numberOfPlaces": 20},
+]
 
 
 # Teste que slugify remplace les espaces par des underscores
@@ -70,23 +83,45 @@ def test_is_competition_past_with_invalid_date():
     assert is_competition_past(competition) is True
 
 
-# Teste la recherche d'un club existant avec next()
-def test_find_existing_club_with_next():
-    club = next((c for c in clubs if c["email"] == "john@simplylift.co"), None)
-    assert club is not None
-    assert club["name"] == "Simply Lift"
+# Teste la recherche d'un club par son email
+def test_find_by_club_email():
+    club = find_by(FAKE_CLUBS, "email", "other@club.com")
+    assert club["name"] == "Other Club"
 
 
 # Teste qu'un club inconnu retourne None
-def test_find_unknown_club_returns_none():
-    club = next((c for c in clubs if c["email"] == "fake@test.com"), None)
-    assert club is None
+def test_find_by_unknown_club_returns_none():
+    assert find_by(FAKE_CLUBS, "email", "fake@test.com") is None
 
 
-# Teste la recherche d'une compétition existante
-def test_find_existing_competition_with_next():
-    competition = next((c for c in competitions if c["name"] == "Spring Festival"), None)
-    assert competition is not None
+# Teste la recherche d'une compétition par son nom
+def test_find_by_competition_name():
+    competition = find_by(FAKE_COMPETITIONS, "name", "Winter Cup")
+    assert competition["numberOfPlaces"] == 20
+
+
+# Teste la recherche d'un club à partir du slug de son nom
+def test_find_by_slug_club():
+    club = find_by_slug(FAKE_CLUBS, "test_club")
+    assert club["email"] == "test@club.com"
+
+
+# Teste qu'un slug inconnu retourne None
+def test_find_by_slug_unknown_returns_none():
+    assert find_by_slug(FAKE_COMPETITIONS, "fake_competition") is None
+
+
+# Teste que les points des clubs sont chargés en entiers
+def test_load_clubs_converts_points_to_int():
+    assert all(isinstance(club["points"], int) for club in loadClubs())
+
+
+# Teste que les places des compétitions sont chargées en entiers
+def test_load_competitions_converts_places_to_int():
+    assert all(
+        isinstance(competition["numberOfPlaces"], int)
+        for competition in loadCompetitions()
+    )
 
 
 # Teste une réservation valide
