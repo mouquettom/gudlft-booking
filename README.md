@@ -212,6 +212,10 @@ The project uses Locust for load testing.
 python server.py
 ```
 
+The data is kept in memory, so bookings made during a load test add
+up. Restart the server before each test run to start from the initial
+data.
+
 ### Start Locust
 
 ``` bash
@@ -226,6 +230,9 @@ Recommended parameters:
 
     Users: 6
     Spawn Rate: 1
+
+Each simulated user is assigned one of the three clubs in turn and
+books one place at a time on Spring Festival.
 
 ### Performance Objectives
 

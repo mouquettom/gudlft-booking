@@ -3,9 +3,26 @@ Tests de performance avec Locust.
 Objectif : ≤ 5s pour les listes, ≤ 2s pour les mises à jour.
 6 utilisateurs par défaut (spécification).
 
-Lancement : locust -f locustfile.py --host=http://localhost:5000
+Lancement : locust -f locustfile.py --host=http://127.0.0.1:5000
+
+Les données sont gardées en mémoire par le serveur : les réservations
+faites pendant un test s'accumulent. Redémarrer le serveur avant chaque
+test pour repartir des données initiales.
 """
+from itertools import cycle
+
 from locust import HttpUser, task, between
+
+
+# Clubs de clubs.json : chaque utilisateur simulé reçoit le suivant
+CLUBS = cycle([
+    {"email": "john@simplylift.co", "name": "Simply Lift",
+     "slug": "simply_lift"},
+    {"email": "admin@irontemple.com", "name": "Iron Temple",
+     "slug": "iron_temple"},
+    {"email": "kate@shelifts.co.uk", "name": "She Lifts",
+     "slug": "she_lifts"},
+])
 
 
 class GudlftUser(HttpUser):
@@ -13,41 +30,40 @@ class GudlftUser(HttpUser):
 
     wait_time = between(1, 3)
 
-    # Données de test représentatives d'un vrai utilisateur
-    EMAIL = "john@simplylift.co"
-    CLUB = "Simply Lift"
+    # Compétition à venir sur laquelle les réservations sont faites
     COMPETITION = "Spring Festival"
     COMPETITION_SLUG = "spring_festival"
-    CLUB_SLUG = "simply_lift"
 
     def on_start(self):
         """
-        Connexion initiale : une seule fois au démarrage de la session.
+        Choisit le club de l'utilisateur puis se connecte une fois.
         Les tâches suivantes réutilisent la session HTTP (cookies).
         """
-        self.client.post("/showSummary", data={"email": self.EMAIL})
+        self.club = next(CLUBS)
+        self.client.post("/showSummary", data={"email": self.club["email"]})
 
     @task(3)
     def view_show_summary_page(self):
-        """ Consulter sa page d'accueil après connexion (liste des compétitions). """
-        self.client.post("/showSummary", data={"email": self.EMAIL})
+        """ Consulter sa page d'accueil (liste des compétitions). """
+        self.client.post("/showSummary", data={"email": self.club["email"]})
 
     @task(2)
     def view_booking_page(self):
         """ Accéder à la page de réservation d'une compétition. """
         self.client.get(
-            f"/book/{self.COMPETITION_SLUG}/{self.CLUB_SLUG}",
-            name="/book/[competition]/[club]"  # regroupe les URLs dans le rapport
+            f"/book/{self.COMPETITION_SLUG}/{self.club['slug']}",
+            # Regroupe les URLs dans le rapport
+            name="/book/[competition]/[club]"
         )
 
     @task(1)
     def purchasePlaces(self):
-        """ Réserver des places — action de mise à jour, doit rester ≤ 2s. """
+        """ Réserver une place — mise à jour, doit rester ≤ 2s. """
         self.client.post(
             "/purchasePlaces",
             data={
                 "competition": self.COMPETITION,
-                "club": self.CLUB,
+                "club": self.club["name"],
                 "places": "1"
             }
         )
@@ -61,4 +77,4 @@ class GudlftUser(HttpUser):
     def logout_and_relogin(self):
         """ Déconnexion puis reconnexion pour simuler un cycle complet. """
         self.client.get("/logout")
-        self.client.post("/showSummary", data={"email": self.EMAIL})
+        self.client.post("/showSummary", data={"email": self.club["email"]})
