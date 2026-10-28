@@ -237,5 +237,5 @@ def logout():
 
 
 # Permet de lancer l'application avec : python server.py
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     app.run()
