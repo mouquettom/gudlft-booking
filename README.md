@@ -28,7 +28,8 @@ comprehensive testing strategy, and perform performance testing.
 ### Business Rules
 
 -   Past competitions cannot be booked
--   Maximum of 12 spots per booking
+-   Maximum of 12 spots per club and per competition, all bookings
+    combined
 -   Cannot book more spots than are available
 -   Cannot book more spots than the club's available points
 

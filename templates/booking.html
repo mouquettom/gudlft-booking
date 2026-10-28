@@ -16,7 +16,11 @@
         {% endif %}
     {% endwith %}
 
-    Places available : {{ competition['numberOfPlaces'] }}
+    <p>Places available : {{ competition['numberOfPlaces'] }}</p>
+    <p>
+        Places already booked by your club :
+        {{ booked_places(club['name'], competition['name']) }} / 12
+    </p>
     <form action="/purchasePlaces" method="post">
         <input type="hidden" name="club" value="{{ club['name'] }}">
         <input type="hidden" name="competition" value="{{ competition['name'] }}">

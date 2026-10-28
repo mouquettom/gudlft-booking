@@ -93,6 +93,44 @@ def test_user_cannot_book_more_than_12_places(client):
     assert b"You cannot book more than 12 places" in response.data
 
 
+# Teste qu'un club ne peut pas dépasser 12 places en plusieurs réservations
+def test_user_cannot_exceed_12_places_over_several_bookings(client):
+    data = {"competition": "Spring Festival", "club": "Simply Lift"}
+
+    first_response = client.post(
+        "/purchasePlaces", data={**data, "places": "12"}
+    )
+    assert b"Great-booking complete!" in first_response.data
+
+    second_response = client.post(
+        "/purchasePlaces", data={**data, "places": "1"}
+    )
+    assert b"You cannot book more than 12 places" in second_response.data
+
+    # La réservation refusée ne doit rien modifier
+    club = next(c for c in server.clubs if c["name"] == "Simply Lift")
+    competition = next(
+        c for c in server.competitions if c["name"] == "Spring Festival"
+    )
+    assert int(club["points"]) == 1
+    assert int(competition["numberOfPlaces"]) == 13
+
+
+# Teste que la page de réservation affiche les places déjà réservées
+def test_booking_page_shows_places_already_booked(client):
+    client.post(
+        "/purchasePlaces",
+        data={
+            "competition": "Spring Festival",
+            "club": "Simply Lift",
+            "places": "5"
+        }
+    )
+
+    response = client.get("/book/spring_festival/simply_lift")
+    assert b"5 / 12" in response.data
+
+
 # Teste qu'un club ne peut pas réserver s'il n'a pas assez de points
 def test_user_cannot_book_without_enough_points(client):
     response = client.post(

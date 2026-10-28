@@ -101,7 +101,19 @@ def test_validate_booking_zero_place():
 
 # Teste le refus d'une réservation de plus de 12 places
 def test_validate_booking_more_than_12_places():
-    assert validate_booking(13, 25, 13) == "You cannot book more than 12 places."
+    assert validate_booking(13, 25, 13) == \
+        "You cannot book more than 12 places per competition."
+
+
+# Teste que les places déjà réservées comptent dans la limite de 12
+def test_validate_booking_more_than_12_places_in_total():
+    assert validate_booking(3, 25, 13, already_booked=10) == \
+        "You cannot book more than 12 places per competition."
+
+
+# Teste qu'on peut compléter une réservation jusqu'à 12 places
+def test_validate_booking_up_to_12_places_in_total():
+    assert validate_booking(2, 25, 13, already_booked=10) is None
 
 
 # Teste le refus si les places disponibles sont insuffisantes
