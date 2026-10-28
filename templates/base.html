@@ -13,11 +13,11 @@
 <body>
     <header class="site-header">
         <h1>GÜDLFT</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('displayPoints') }}">Club Points</a>
+        </nav>
     </header>
-    <nav>
-        <a href="{{ url_for('index') }}">Home</a>
-        <a href="{{ url_for('displayPoints') }}">Club Points</a>
-    </nav>
 
     <main class="container">
         {% block content %}
