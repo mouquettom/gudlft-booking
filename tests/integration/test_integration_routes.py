@@ -59,6 +59,46 @@ def test_book_page_invalid_competition_redirects(client):
     assert b"Something went wrong" in response.data
 
 
+# Teste qu'on ne peut pas ouvrir la réservation d'une compétition passée
+def test_book_page_past_competition_is_refused(client):
+    response = client.get("/book/summer_open/simply_lift")
+
+    assert response.status_code == 200
+    assert b"This competition has already taken place" in response.data
+    assert b"How many places" not in response.data
+
+
+# Teste qu'une réservation avec un club inconnu redirige vers l'accueil
+def test_purchase_unknown_club_redirects(client):
+    response = client.post(
+        "/purchasePlaces",
+        data={
+            "competition": "Spring Festival",
+            "club": "Fake Club",
+            "places": "1"
+        },
+        follow_redirects=True
+    )
+
+    assert response.status_code == 200
+    assert b"Competition or club not found" in response.data
+
+
+# Teste qu'un nombre de places non numérique est refusé proprement
+def test_purchase_invalid_number_of_places(client):
+    response = client.post(
+        "/purchasePlaces",
+        data={
+            "competition": "Spring Festival",
+            "club": "Simply Lift",
+            "places": "abc"
+        }
+    )
+
+    assert response.status_code == 200
+    assert b"Invalid number of places" in response.data
+
+
 # Teste que la déconnexion ramène vers l'accueil
 def test_logout_redirects_home(client):
     response = client.get("/logout", follow_redirects=True)
