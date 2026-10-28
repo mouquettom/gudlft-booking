@@ -201,3 +201,8 @@ def displayPoints():
 @app.route('/logout')
 def logout():
     return redirect(url_for('index'))
+
+
+# Permet de lancer l'application avec : python server.py
+if __name__ == '__main__':
+    app.run()

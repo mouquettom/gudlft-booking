@@ -129,8 +129,12 @@ python server.py
 or
 
 ``` bash
-flask run
+flask --app server run
 ```
+
+The `--app server` option is required because the application is
+defined in `server.py` (Flask only finds `app.py` or `wsgi.py` on its
+own).
 
 The application will be available at:
 
