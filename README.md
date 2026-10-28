@@ -27,7 +27,8 @@ comprehensive testing strategy, and perform performance testing.
 
 ### Business Rules
 
--   Past competitions cannot be booked
+-   Past competitions cannot be booked (the sample competition
+    *Summer Open* is in the past to show this rule)
 -   Maximum of 12 spots per club and per competition, all bookings
     combined
 -   Cannot book more spots than are available
@@ -53,7 +54,7 @@ comprehensive testing strategy, and perform performance testing.
 
 ## Project Structure
 
-    GUDLFT/
+    gudlft-booking/
     │
     ├── static/
     │   └── css/
@@ -75,9 +76,11 @@ comprehensive testing strategy, and perform performance testing.
     │   │   └── test_unit_server.py
     │   └── conftest.py
     │
+    ├── .gitignore
     ├── clubs.json
     ├── competitions.json
     ├── locustfile.py
+    ├── pytest.ini
     ├── requirements.txt
     ├── server.py
     └── README.md
@@ -178,9 +181,10 @@ Validation of business logic functions:
 
 -   `slugify()`
 -   `parse_competition_date()`
+-   `is_competition_past()`
 -   `validate_booking()`
--   Club lookup
--   Competition lookup
+-   `find_by()` and `find_by_slug()` (club and competition lookup)
+-   `loadClubs()` and `loadCompetitions()` (data loading)
 
 ### Integration Tests
 
@@ -253,11 +257,35 @@ Bookings were possible even when the club had insufficient points.
 
 ### Bug #3
 
-Bookings were possible for past competitions.
+A club could book more than 12 spots on the same competition,
+including over several bookings.
 
 ### Bug #4
 
-Booking more than 12 spots was allowed.
+Bookings were possible for past competitions.
+
+### Bug #5
+
+Club points were not deducted after a booking.
+
+### Bug #6
+
+Bookings were possible beyond the number of spots available in the
+competition.
+
+### Bug #7
+
+Opening the booking page of an unknown club or competition, or sending
+an invalid number of spots, caused an error.
+
+------------------------------------------------------------------------
+
+## Added Feature
+
+### Points Display Board
+
+A public page (`/points`, "Club Points" in the menu) shows the points
+balance of every club, without logging in.
 
 ------------------------------------------------------------------------
 
